@@ -13,18 +13,23 @@ interface Wallet {
 function App() {
   const ethereumContext = useContext(EthereumContext)
   if (!ethereumContext) return <div>No Ethereum Context, contact developer</div>
-  const { currentAccount, connectWallet, multiSend } = ethereumContext
+  const { currentAccount, connectWallet, multiSend, getSymbol } =
+    ethereumContext
 
   const [wallets, setWallets] = useState<Wallet[]>([
     { address: "", amount: 0, status: "" },
   ])
   const [tokenAddress, setTokenAddress] = useState("")
+  const [symbol, setSymbol] = useState("")
 
   function handleTokenAddressChange(
     event: React.ChangeEvent<HTMLInputElement>
   ) {
     const tokenAddress = event.target.value
     setTokenAddress(tokenAddress)
+    getSymbol(tokenAddress)
+      .then((symbol) => setSymbol(symbol))
+      .catch(() => setSymbol("ERROR"))
   }
 
   function handleWalletFormChange(
@@ -68,7 +73,7 @@ function App() {
           value={tokenAddress}
           onChange={handleTokenAddressChange}
         />
-        <p>SYMBOL</p>
+        <p>{symbol ? symbol : "SYMBOL"}</p>
       </div>
 
       <div className="mx-2 flex flex-col items-center justify-center p-2">

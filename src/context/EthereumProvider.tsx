@@ -8,6 +8,7 @@ interface EthereumContextProps {
   currentAccount: string
   connectWallet: () => void
   multiSend: (wallets: Wallet[], tokenAddress: string) => void
+  getSymbol: (tokenAddress: string) => Promise<string>
 }
 
 interface Wallet {
@@ -79,6 +80,13 @@ export const EthereumProvider = (props: EthereumProviderProps) => {
     })
   }
 
+  async function getSymbol(tokenAddress: string) {
+    const provider = new ethers.BrowserProvider(ethereum)
+    const tokenContract = new ethers.Contract(tokenAddress, ERC20abi, provider)
+    const symbol = await tokenContract.symbol()
+    return symbol
+  }
+
   React.useEffect(() => {
     checkIfWalletIsConnect()
     if (!currentAccount) return
@@ -108,6 +116,7 @@ export const EthereumProvider = (props: EthereumProviderProps) => {
         currentAccount,
         connectWallet,
         multiSend,
+        getSymbol,
       }}
     >
       {children}
