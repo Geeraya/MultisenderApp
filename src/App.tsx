@@ -1,4 +1,5 @@
 import { SyntheticEvent, useContext, useState } from "react"
+import { ethers } from "ethers"
 
 import { EthereumContext } from "./context/EthereumProvider"
 
@@ -11,13 +12,22 @@ interface Wallet {
 
 function App() {
   const ethereumContext = useContext(EthereumContext)
-  const { currentAccount, connectWallet } = ethereumContext ?? {}
+  if (!ethereumContext) return <div>No Ethereum Context, contact developer</div>
+  const { currentAccount, connectWallet, multiSend } = ethereumContext
 
   const [wallets, setWallets] = useState<Wallet[]>([
     { address: "", amount: 0, status: "" },
   ])
+  const [tokenAddress, setTokenAddress] = useState("")
 
-  function handleChange(
+  function handleTokenAddressChange(
+    event: React.ChangeEvent<HTMLInputElement>
+  ) {
+    const tokenAddress = event.target.value
+    setTokenAddress(tokenAddress)
+  }
+
+  function handleWalletFormChange(
     index: number,
     event: React.ChangeEvent<HTMLInputElement>
   ): void {
@@ -27,7 +37,8 @@ function App() {
   }
 
   function handleAdd(): void {
-    setWallets([...wallets, { address: "", amount: 0, status: "" }])
+    const amount = wallets[wallets.length - 1].amount
+    setWallets([...wallets, { address: "", amount, status: "" }])
   }
 
   function handleDelete(index: number): void {
@@ -52,8 +63,12 @@ function App() {
       {/* BODY */}
       <div className="mt-2 flex gap-1 border p-2">
         <p>Token address:</p>
-        <input />
-        <p>SYM</p>
+        <input
+          className="text-sm text-black"
+          value={tokenAddress}
+          onChange={handleTokenAddressChange}
+        />
+        <p>SYMBOL</p>
       </div>
 
       <div className="mx-2 flex flex-col items-center justify-center p-2">
@@ -72,7 +87,7 @@ function App() {
                     value={wallet.address}
                     type="text"
                     name="address"
-                    onChange={(event) => handleChange(index, event)}
+                    onChange={(event) => handleWalletFormChange(index, event)}
                   />
                 </div>
                 <div className="flex gap-1">
@@ -82,7 +97,7 @@ function App() {
                     value={wallet.amount}
                     type="number"
                     name="amount"
-                    onChange={(event) => handleChange(index, event)}
+                    onChange={(event) => handleWalletFormChange(index, event)}
                   />
                 </div>
               </div>
@@ -102,7 +117,15 @@ function App() {
           <button className="rounded-md border p-1" onClick={handleAdd}>
             Add
           </button>
-          <button className="rounded-md border p-1">Send</button>
+          <button
+            className="rounded-md border p-1"
+            onClick={() => {
+              if (wallets.length === 0) return
+              multiSend(wallets, tokenAddress)
+            }}
+          >
+            Send
+          </button>
         </div>
       </div>
     </div>
