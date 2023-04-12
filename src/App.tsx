@@ -1,5 +1,4 @@
-import { SyntheticEvent, useContext, useState } from "react"
-import { ethers } from "ethers"
+import React, { useContext, useState } from "react"
 
 import { EthereumContext } from "./context/EthereumProvider"
 

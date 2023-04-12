@@ -1,5 +1,5 @@
 import React from "react"
-import { BrowserProvider, JsonRpcProvider, JsonRpcSigner, ethers } from "ethers"
+import { type JsonRpcSigner, ethers } from "ethers"
 import { ERC20abi } from "../utils/ERC20abi"
 
 // TYPES
